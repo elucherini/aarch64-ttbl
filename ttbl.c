@@ -16,6 +16,18 @@
 // BLOCK
 #define TTBL_LOWER_ATTR_MASK		0x0000000000000ffc // (addr & MASK = isolates [11:2])
 #define TTBL_UPPER_ATTR_MASK		0xfff0000000000000 // (addr & MASK = isolates [63:52])
+#define TTBL_L1_OA_MASK				0x0000ffffc0000000 // (addr & MASK = isolates [47:30])
+#define TTBL_L2_OA_MASK				0x0000ffffffe00000 // (addr & MASK = isolates [47:21])
+
+// BLOCK STAGE 1
+
+
+// TABLE
+#define TTBL_TABLE_ADDR_MASK		0x0000fffffffff000 // (addr & MASK = isolates [47:12])
+#define TTBL_PXNTABLE_MASK			0x0800000000000000
+#define TTBL_XNTABLE_MASK 			0x1000000000000000
+#define TTBL_APTABLE_MASK			0x6000000000000000
+#define TTBL_NSTABLE_MASK			0x8000000000000000
 
 
 
