@@ -89,23 +89,23 @@
 
 
 
-int64_t ttbl_invalidate_entry (int64_t *addr)
+uint64_t ttbl_invalidate_entry (uint64_t *addr)
 {
 	*addr &= TTBL_INVALIDATE_ENTRY_MASK;
 }
 
-bool ttbl_is_valid_entry (int64_t addr)
+bool ttbl_is_valid_entry (uint64_t addr)
 {
 	return (addr & TTBL_IS_VALID_ENTRY_MASK);
 }
 
-bool ttbl_is_table_entry (int64_t addr)
+bool ttbl_is_table_entry (uint64_t addr)
 {
 	// TODO: check that entry belongs to level 0, 1, 2
 	return addr & TTBL_IS_TABLE_ENTRY_MASK;
 }
 
-bool ttbl_is_block_entry (int64_t addr)
+bool ttbl_is_block_entry (uint64_t addr)
 {
 	// TODO: check that entry belongs to level 0, 1, 2
 	return !ttbl_is_table_entry(addr);
@@ -114,8 +114,8 @@ bool ttbl_is_block_entry (int64_t addr)
 int main()
 {
 	/* TEST PROGRAM */
-	int64_t a = 0x0000f44400004445LL;
-	int64_t b = 0x0000f44400004446LL;
+	uint64_t a = 0x0000f44400004445LL;
+	uint64_t b = 0x0000f44400004446LL;
 
 	// TEST VALIDATION/INVALIDATION
 	/*
