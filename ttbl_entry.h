@@ -1,3 +1,4 @@
+#include <stdint.h>
 
 typedef uint64_t ttbl_entry;
 
