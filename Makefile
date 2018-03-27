@@ -7,3 +7,6 @@ DEPS=ttbl_entry.h
 
 ttbl: ttbl_entry_test.o ttbl_entry.o
 	$(CC) -o output.out ttbl_entry_test.o ttbl_entry.o $(CFLAGS)
+
+clean:
+	rm -fr *.o
