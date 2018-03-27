@@ -81,3 +81,16 @@ typedef uint64_t ttbl_entry;
 #define TTBL_APTABLE_SHIFT			61
 #define TTBL_NSTABLE_MASK			0x8000000000000000
 #define TTBL_NSTABLE_SHIFT			63
+
+
+void ttbl_entry_set_invalid (ttbl_entry *addr);
+
+void ttbl_entry_reset (ttbl_entry *addr);
+
+void ttbl_entry_set_table (ttbl_entry *addr);
+
+bool ttbl_entry_is_valid (ttbl_entry addr);
+
+bool ttbl_entry_is_table (ttbl_entry addr);
+
+bool ttbl_entry_is_block (ttbl_entry addr);
