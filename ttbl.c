@@ -92,6 +92,12 @@ void ttbl_entry_set_invalid (ttbl_entry *addr)
 	*addr &= TTBL_INVALIDATE_ENTRY_MASK;
 }
 
+void ttbl_entry_reset (ttbl_entry *addr)
+{
+	*addr = 0;
+	//memset(*addr, 0, sizeof(ttbl_entry));
+}
+
 bool ttbl_entry_is_valid (ttbl_entry addr)
 {
 	return (addr & TTBL_IS_VALID_ENTRY_MASK);
@@ -148,5 +154,8 @@ int main()
 	b |= TTBL_TABLE_ENTRY_MASK;
 	if (!ttbl_entry_is_block(b))
 		printf("b becomes a table: 0x%016llx\n", b);
-	
+	// reset entry
+	ttbl_entry_reset(&b);
+	printf("Resetting b...\n");
+	printf("b is now: 0x%016llx\n", b);
 }
