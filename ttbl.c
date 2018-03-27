@@ -15,7 +15,6 @@ typedef uint64_t ttbl_entry;
 #define TTBL_TABLE_ENTRY_MASK		0x0000000000000002
 #define TTBL_IS_TABLE_ENTRY_MASK	TTBL_TABLE_ENTRY_MASK //(addr & MASK != 0? TABLE : BLOCK)
 
-
 // LEVEL 3 (PAGE)
 #define TTBL_PAGE_LOWER_ATTR_MASK	0x0000000000000ffc
 #define TTBL_PAGE_LOWER_ATTR_SHIFT	2
@@ -23,7 +22,6 @@ typedef uint64_t ttbl_entry;
 #define TTBL_PAGE_OA_SHIFT			12
 #define TTBL_PAGE_UPPER_ATTR_MASK	0xfff8000000000000
 #define TTBL_PAGE_UPPER_ATTR_SHIFT	51
-
 
 // BLOCK
 #define TTBL_BLOCK_LOWER_ATTR_MASK	TTBL_PAGE_LOWER_ATTR_MASK // (addr & MASK = isolates [11:2])
@@ -89,9 +87,7 @@ typedef uint64_t ttbl_entry;
 #define TTBL_NSTABLE_SHIFT			63
 
 
-
-
-ttbl_entry ttbl_entry_set_invalid (ttbl_entry *addr)
+void ttbl_entry_set_invalid (ttbl_entry *addr)
 {
 	*addr &= TTBL_INVALIDATE_ENTRY_MASK;
 }
