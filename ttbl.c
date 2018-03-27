@@ -94,21 +94,21 @@ uint64_t ttbl_entry_set_invalid (uint64_t *addr)
 	*addr &= TTBL_INVALIDATE_ENTRY_MASK;
 }
 
-bool ttbl_is_valid_entry (uint64_t addr)
+bool ttbl_entry_is_valid (uint64_t addr)
 {
 	return (addr & TTBL_IS_VALID_ENTRY_MASK);
 }
 
-bool ttbl_is_table_entry (uint64_t addr)
+bool ttbl_entry_is_table (uint64_t addr)
 {
 	// TODO: check that entry belongs to level 0, 1, 2
 	return addr & TTBL_IS_TABLE_ENTRY_MASK;
 }
 
-bool ttbl_is_block_entry (uint64_t addr)
+bool ttbl_entry_is_block (uint64_t addr)
 {
 	// TODO: check that entry belongs to level 0, 1, 2
-	return !ttbl_is_table_entry(addr);
+	return !ttbl_entry_is_table(addr);
 }
 
 int main()
@@ -118,37 +118,37 @@ int main()
 	uint64_t b = 0x0000f44400004446LL;
 
 	// TEST VALIDATION/INVALIDATION
-	
-	if (ttbl_is_valid_entry(a))
+	/*
+	if (ttbl_entry_is_valid(a))
 		printf("a is valid: 0x%016llx\n", a);
 	// invalidate i
 	printf("Invalidate a...\n");
 	ttbl_entry_set_invalid(&a);
 	//a &= TTBL_INVALIDATE_ENTRY_MASK;
-	if (!ttbl_is_valid_entry(a))
+	if (!ttbl_entry_is_valid(a))
 		printf("a becomes invalid: 0x%016llx\n", a);
 	// validate i
 	printf("Validate a again...\n");
 	a |= TTBL_VALIDATE_ENTRY_MASK;
-	if (ttbl_is_valid_entry(a))
+	if (ttbl_entry_is_valid(a))
 		printf("a becomes valid: 0x%016llx\n", a);
-	
+	*/
 
 	// LEVEL 0, 1, 2
 
 	// TEST BLOCK/TABLE
-	/*
-	if (ttbl_is_table_entry(b))
+	
+	if (ttbl_entry_is_table(b))
 		printf("b is a table: 0x%016llx\n", b);
 	// convert b into block
 	printf("Convert b into a block...\n");
 	b &= TTBL_BLOCK_ENTRY_MASK;
-	if (ttbl_is_block_entry(b))
+	if (ttbl_entry_is_block(b))
 		printf("b becomes a block: 0x%016llx\n", b);
 	// convert b into table
 	printf("Convert b back into a table...\n");
 	b |= TTBL_TABLE_ENTRY_MASK;
-	if (!ttbl_is_block_entry(b))
+	if (!ttbl_entry_is_block(b))
 		printf("b becomes a table: 0x%016llx\n", b);
-	*/
+	
 }
