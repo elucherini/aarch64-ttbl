@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <ttbl.h>
+#include <ttbl_entry.h>
 
 
 void ttbl_entry_set_invalid (ttbl_entry *addr)
@@ -58,8 +58,6 @@ int main()
 	if (ttbl_entry_is_valid(a))
 		printf("a becomes valid: 0x%016llx\n", a);
 	*/
-
-	// LEVEL 0, 1, 2
 
 	// TEST BLOCK/TABLE
 	
