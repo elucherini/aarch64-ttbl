@@ -3,6 +3,8 @@
 #include <stdbool.h>
 
 
+typedef uint64_t ttbl_entry;
+
 // MASKS: GENERIC
 #define TTBL_INVALIDATE_ENTRY_MASK	0xfffffffffffffffe
 #define TTBL_VALIDATE_ENTRY_MASK	0x0000000000000001
@@ -89,23 +91,23 @@
 
 
 
-uint64_t ttbl_entry_set_invalid (uint64_t *addr)
+ttbl_entry ttbl_entry_set_invalid (ttbl_entry *addr)
 {
 	*addr &= TTBL_INVALIDATE_ENTRY_MASK;
 }
 
-bool ttbl_entry_is_valid (uint64_t addr)
+bool ttbl_entry_is_valid (ttbl_entry addr)
 {
 	return (addr & TTBL_IS_VALID_ENTRY_MASK);
 }
 
-bool ttbl_entry_is_table (uint64_t addr)
+bool ttbl_entry_is_table (ttbl_entry addr)
 {
 	// TODO: check that entry belongs to level 0, 1, 2
 	return addr & TTBL_IS_TABLE_ENTRY_MASK;
 }
 
-bool ttbl_entry_is_block (uint64_t addr)
+bool ttbl_entry_is_block (ttbl_entry addr)
 {
 	// TODO: check that entry belongs to level 0, 1, 2
 	return !ttbl_entry_is_table(addr);
@@ -114,8 +116,8 @@ bool ttbl_entry_is_block (uint64_t addr)
 int main()
 {
 	/* TEST PROGRAM */
-	uint64_t a = 0x0000f44400004445LL;
-	uint64_t b = 0x0000f44400004446LL;
+	ttbl_entry a = 0x0000f44400004445LL;
+	ttbl_entry b = 0x0000f44400004446LL;
 
 	// TEST VALIDATION/INVALIDATION
 	/*
