@@ -89,7 +89,7 @@
 
 
 
-uint64_t ttbl_invalidate_entry (uint64_t *addr)
+uint64_t ttbl_entry_set_invalid (uint64_t *addr)
 {
 	*addr &= TTBL_INVALIDATE_ENTRY_MASK;
 }
@@ -118,12 +118,12 @@ int main()
 	uint64_t b = 0x0000f44400004446LL;
 
 	// TEST VALIDATION/INVALIDATION
-	/*
+	
 	if (ttbl_is_valid_entry(a))
 		printf("a is valid: 0x%016llx\n", a);
 	// invalidate i
 	printf("Invalidate a...\n");
-	ttbl_invalidate_entry(&a);
+	ttbl_entry_set_invalid(&a);
 	//a &= TTBL_INVALIDATE_ENTRY_MASK;
 	if (!ttbl_is_valid_entry(a))
 		printf("a becomes invalid: 0x%016llx\n", a);
@@ -132,12 +132,12 @@ int main()
 	a |= TTBL_VALIDATE_ENTRY_MASK;
 	if (ttbl_is_valid_entry(a))
 		printf("a becomes valid: 0x%016llx\n", a);
-	*/
+	
 
 	// LEVEL 0, 1, 2
 
 	// TEST BLOCK/TABLE
-	
+	/*
 	if (ttbl_is_table_entry(b))
 		printf("b is a table: 0x%016llx\n", b);
 	// convert b into block
@@ -150,5 +150,5 @@ int main()
 	b |= TTBL_TABLE_ENTRY_MASK;
 	if (!ttbl_is_block_entry(b))
 		printf("b becomes a table: 0x%016llx\n", b);
-	
+	*/
 }
