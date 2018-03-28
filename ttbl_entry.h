@@ -88,6 +88,8 @@ void ttbl_entry_set_invalid (ttbl_entry *addr);
 
 void ttbl_entry_reset (ttbl_entry *addr);
 
+void ttbl_entry_set_ap (ttbl_entry *addr, short unsigned int ap);
+
 void ttbl_entry_set_table (ttbl_entry *addr);
 
 bool ttbl_entry_is_valid (ttbl_entry addr);
