@@ -49,10 +49,6 @@ void ttbl_entry_set_next_table_addr(ttbl_entry *entry, unsigned long int addr)
 	*entry |= (addr << TTBL_TABLE_NEXTTBL_SHIFT) & TTBL_TABLE_NEXTTBL_MASK;
 }
 
-void ttbl_entry_set_table (ttbl_entry *entry)
-{
-}
-
 bool ttbl_entry_is_valid (ttbl_entry entry)
 {
 	return (entry & TTBL_IS_VALID_ENTRY_MASK);

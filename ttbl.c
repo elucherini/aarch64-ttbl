@@ -32,7 +32,7 @@ ttbl_entry ttbl_l3[TTBL_L3_ENTRY_CNT];
 void ttbl_init(unsigned long map_start, unsigned long map_end)
 {
 	//ttbl_entry *p, *entry;
-	int i, page_idx;
+	int i, page_idx, count_pages = 0;
 	unsigned long page_addr = map_start;
 	struct ttbl_ctrl ttbl_c = {NULL, 0};
 	//unsigned long addr = (unsigned long) &ttbl_l1;
@@ -53,6 +53,7 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 
 		assert(ttbl == ttbl_l1);
 
+		/* Setup level-1 ttbl */
 		/* what I would normally do is find the level-1 index of the page.
 		 * I'll just default page_idx to 0 because I'm only testing on a single ttbl_l1 entry:
 		 */
@@ -62,13 +63,42 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 		if (ttbl_entry_is_valid(ttbl[page_idx])) {
 			/* Find level-2 ttbl */
 			//ttbl = (ttbl_entry *)(ttbl[page_idx] & TTBL_TABLE_NEXTTBL_MASK);
-			printf("Level-2 ttbl at %012llx\n", ttbl);
+			//printf("Level-2 ttbl at %012llx\n", ttbl);
 		} else {
-			/* Set new level-2 ttbl */
+			/* Create new level-2 ttbl */
 			for (i = 0; i < TTBL_L2_ENTRY_CNT; i++) {
 				ttbl_l2[i] = 0x0ULL;
 			}
+			//ttbl_entry_set_next_table_addr(&ttbl[page_idx], (unsigned long) ttbl_l2);
+			ttbl[page_idx] |= TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK;
+			ttbl = ttbl_l2;
+		}
+		/* Setup level-2 ttbl */
+		page_idx = 0;
+		// page_idx = (page_addr & TTBL_LEVEL2_MASK) >> TTBL_LEVEL2_SHIFT;
 
+		if (ttbl_entry_is_valid(ttbl[page_idx])) {
+			/* Find level-3 ttbl */
+			//ttbl = (ttbl_entry *)(ttbl[page_idx] & TTBL_TABLE_NEXTTBL_MASK);
+			//printf("Level-3 ttbl at %012llx\n", ttbl);
+		} else {
+			/* Create new level-3 ttbl */
+			for (i = 0; i < TTBL_L3_ENTRY_CNT; i++) {
+				ttbl_l3[i] = 0x0ULL;
+			}
+			ttbl[page_idx] |= TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK;
+			ttbl = ttbl_l3;
+		}
+		/* Setup level-3 ttbl */
+		page_idx = count_pages;
+		count_pages++;
+		// page_idx = (page_addr & TTBL_LEVEL3_MASK) >> TTBL_LEVEL3_SHIFT;
+		if (!ttbl_entry_is_valid(ttbl[page_idx])) {
+			/* Setup level-3 ttbl entry */
+			/* normally this would be the physical address of the page */
+			ttbl[page_idx] = page_addr & TTBL_PAGE_OA_MASK;
+			// set permissions...
+			ttbl[page_idx] |= (TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK);
 		}
 
 		page_addr += TTBL_PAGESIZE;
