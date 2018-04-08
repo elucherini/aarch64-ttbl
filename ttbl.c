@@ -9,6 +9,12 @@ struct page {
 	uint64_t two;
 };
 
+/* Define structure to manage ttbl's */
+struct ttbl_ctrl {
+	ttbl_entry *base;
+	int count;
+};
+
 /* Define TTBR0_EL1.Baddr */
 unsigned long ttbr_el1_baddr;
 
@@ -28,11 +34,12 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 	//ttbl_entry *p, *entry;
 	int i, page_idx;
 	unsigned long page_addr = map_start;
+	struct ttbl_ctrl ttbl_c = {NULL, 0};
 	//unsigned long addr = (unsigned long) &ttbl_l1;
 	//p = ttbl_l3;
-	ttbl_entry *ttbl = (ttbl_entry *) ttbr_el1_baddr;
+	ttbl_entry *ttbl;
 
-	assert(ttbl == ttbl_l1);
+	ttbl_c.base = (ttbl_entry *) ttbr_el1_baddr;
 
 	/* Init ttbl_l1 entries to 0x0 */
 	for (i = 0; i < TTBL_L1_ENTRY_CNT; i++) {
@@ -42,6 +49,10 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 	printf("Map start: 0x%012llx. Map end: 0x%012llx\n\n", map_start, map_end);
 
 	while (page_addr < map_end) {
+		ttbl = ttbl_c.base;
+
+		assert(ttbl == ttbl_l1);
+
 		/* what I would normally do is find the level-1 index of the page.
 		 * I'll just default page_idx to 0 because I'm only testing on a single ttbl_l1 entry:
 		 */
@@ -57,6 +68,7 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 			for (i = 0; i < TTBL_L2_ENTRY_CNT; i++) {
 				ttbl_l2[i] = 0x0ULL;
 			}
+
 		}
 
 		page_addr += TTBL_PAGESIZE;
