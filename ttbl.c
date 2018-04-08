@@ -12,6 +12,7 @@ struct page {
 unsigned long ttbr_el1_baddr;
 
 // Reserve memory for pages and TTBL
+// Normally there would be multiple ttbl_l1 and ttbl_l2
 struct page pages[512];
 
 ttbl_entry ttbl_l1;
@@ -31,9 +32,12 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 	p = ttbl_l3;
 	ttbl_entry *ttbl = (ttbl_entry *) ttbr_el1_baddr;
 
+	// let's assume multiple ttbl_l1 here
 	for (i = 0; i < TTBL_L1_ENTRY_CNT; i++) {
-
+		ttbl_l1 = 0x0ULL;
 	}
+
+	printf("ttbl_l1 at %p: 0x%016llx\n", &ttbl_l1, ttbl_l1);
 
 	printf("Map start: 0x%012llx. Map end: 0x%012llx\n\n", map_start, map_end);
 
@@ -41,7 +45,7 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 		
 		page_addr += TTBL_PAGESIZE;
 	}
-
+/*
 	ttbl_entry_set_ap(&ttbl_l1, 1);
 	//ttbl_entry_set_next_table_addr(&ttbl_l1, addr);
 	printf("ttbl_l1 at %p: 0x%016llx\n", &ttbl_l1, ttbl_l1);
@@ -56,6 +60,7 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 		ttbl_entry_set_ap(entry, 1);
 		//printf("ttbl_l3 entry #%d at %p: 0x%016llx\n", i, entry, *entry);
 	}
+*/
 
 }
 
@@ -65,7 +70,7 @@ int main()
 	struct page *pages_end = &pages[511];
 	pages_end++;
 
-	ttbr_el1_baddr = 0x56490967b070;
+	ttbr_el1_baddr = (unsigned long) &ttbl_l1;
 	printf("TTBR_EL1.BADDR = 0x%012llx\n", ttbr_el1_baddr);
 	ttbl_init((unsigned long) pages_start, (unsigned long) pages_end);
 	//printf("ttbl_l3 is %p\n", p);
