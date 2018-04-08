@@ -20,6 +20,8 @@ ttbl_entry ttbl_l3[512];
 
 
 
+
+
 void ttbl_init(unsigned long map_start, unsigned long map_end)
 {
 	ttbl_entry *p, *entry;
@@ -41,11 +43,11 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 	}
 
 	ttbl_entry_set_ap(&ttbl_l1, 1);
-	ttbl_entry_set_next_table_addr(&ttbl_l1, addr);
+	//ttbl_entry_set_next_table_addr(&ttbl_l1, addr);
 	printf("ttbl_l1 at %p: 0x%016llx\n", &ttbl_l1, ttbl_l1);
 	addr = 0x111101110;
 	ttbl_entry_set_ap(&ttbl_l2, 1);
-	ttbl_entry_set_next_table_addr(&ttbl_l2, addr);
+	//ttbl_entry_set_next_table_addr(&ttbl_l2, addr);
 	printf("ttbl_l2 at %p: 0x%016llx\n", &ttbl_l2, ttbl_l2);
 	for (i = 0; p <= &ttbl_l3[511]; p++, i++) {
 		entry = p;
