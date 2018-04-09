@@ -26,10 +26,7 @@ ttbl_entry ttbl_l2[TTBL_L2_ENTRY_CNT];
 ttbl_entry ttbl_l3[TTBL_L3_ENTRY_CNT];
 
 
-
-
-
-void ttbl_init(unsigned long map_start, unsigned long map_end)
+void ttbl_init(unsigned long map_start, unsigned long map_end, bool writeable)
 {
 	//ttbl_entry *p, *entry;
 	int i, page_idx, count_pages = 0;
@@ -69,8 +66,8 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 			for (i = 0; i < TTBL_L2_ENTRY_CNT; i++) {
 				ttbl_l2[i] = 0x0ULL;
 			}
-			//ttbl_entry_set_next_table_addr(&ttbl[page_idx], (unsigned long) ttbl_l2);
-			ttbl[page_idx] |= TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK;
+			ttbl[page_idx] |= ((unsigned long) ttbl_l2) & TTBL_TABLE_NEXTTBL_MASK;
+			ttbl[page_idx] |= (TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK);
 			ttbl = ttbl_l2;
 		}
 		/* Setup level-2 ttbl */
@@ -86,7 +83,8 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 			for (i = 0; i < TTBL_L3_ENTRY_CNT; i++) {
 				ttbl_l3[i] = 0x0ULL;
 			}
-			ttbl[page_idx] |= TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK;
+			ttbl[page_idx] |= ((unsigned long) ttbl_l3) & TTBL_TABLE_NEXTTBL_MASK;
+			ttbl[page_idx] |= (TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK);
 			ttbl = ttbl_l3;
 		}
 		/* Setup level-3 ttbl */
@@ -96,9 +94,20 @@ void ttbl_init(unsigned long map_start, unsigned long map_end)
 		if (!ttbl_entry_is_valid(ttbl[page_idx])) {
 			/* Setup level-3 ttbl entry */
 			/* normally this would be the physical address of the page */
-			ttbl[page_idx] = page_addr & TTBL_PAGE_OA_MASK;
-			// set permissions...
+			// ttbl[page_idx] = va_to_pa(page_addr) & TTBL_PAGE_OA_MASK;
+			ttbl[page_idx] = (page_addr << TTBL_PAGE_OA_SHIFT) & TTBL_PAGE_OA_MASK;
+			ttbl[page_idx] |= TTBL_LOWER_AF_MASK;
+			if (writeable)
+				ttbl_entry_set_ap(&ttbl[page_idx], 0);
+			else
+				ttbl_entry_set_ap(&ttbl[page_idx], 2);
+			ttbl[page_idx] |= (5 << TTBL_ST1_LOWER_ATTRIDX_SHIFT) & TTBL_ST1_LOWER_ATTRIDX_MASK;
+			ttbl[page_idx] |= TTBL_ST1_LOWER_NS_MASK;
+			ttbl[page_idx] |= (0x3 << TTBL_LOWER_SH_SHIFT);
 			ttbl[page_idx] |= (TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK);
+
+			printf("Entry %p maps page 0x%012llx: 0x%016llx\n", &ttbl[page_idx], page_addr, ttbl[page_idx]);
+
 		}
 
 		page_addr += TTBL_PAGESIZE;
@@ -130,6 +139,6 @@ int main()
 
 	ttbr_el1_baddr = (unsigned long) ttbl_l1;
 	printf("TTBR0_EL1.BADDR points to ttbl_l1: 0x%012llx\n", ttbr_el1_baddr);
-	ttbl_init((unsigned long) pages_start, (unsigned long) pages_end);
+	ttbl_init((unsigned long) pages_start, (unsigned long) pages_end, true);
 	//printf("ttbl_l3 is %p\n", p);
 }
