@@ -20,7 +20,7 @@ struct ttbl_ctrl {
 unsigned long ttbr_el1_baddr;
 
 /* Reserve memory for pages and TTBL */
-struct page pages[512];
+struct page pages[TTBL_L3_ENTRY_CNT];
 
 /* TTBL bigger than one for test purposes */
 ttbl_entry ttbl_array[TTBL_L1_ENTRY_CNT + TTBL_L2_ENTRY_CNT + TTBL_L3_ENTRY_CNT + 1];
@@ -68,6 +68,7 @@ void ttbl_init(unsigned long map_start, unsigned long map_end, bool writeable)
 		if (ttbl_entry_is_valid(ttbl[page_idx])) {
 			/* Find level-2 ttbl */
 			//ttbl = (ttbl_entry *)(ttbl[page_idx] & TTBL_TABLE_NEXTTBL_MASK);
+			ttbl = ttbl_l2;
 			//printf("Level-2 ttbl at %012llx\n", ttbl);
 		} else {
 			/* Create new level-2 ttbl */
@@ -80,6 +81,7 @@ void ttbl_init(unsigned long map_start, unsigned long map_end, bool writeable)
 			assert(ttbl == ttbl_l2);
 			ttbl_c.next_ttbl += TTBL_L2_ENTRY_CNT;
 			assert(ttbl_c.next_ttbl == ttbl_l3);
+			assert(ttbl_l3[1] == 0);
 		}
 		/* Setup level-2 ttbl */
 		page_idx = 0;
@@ -88,6 +90,7 @@ void ttbl_init(unsigned long map_start, unsigned long map_end, bool writeable)
 		if (ttbl_entry_is_valid(ttbl[page_idx])) {
 			/* Find level-3 ttbl */
 			//ttbl = (ttbl_entry *)(ttbl[page_idx] & TTBL_TABLE_NEXTTBL_MASK);
+			ttbl = ttbl_l3;
 			//printf("Level-3 ttbl at %012llx\n", ttbl);
 		} else {
 			/* Create new level-3 ttbl */
@@ -100,10 +103,10 @@ void ttbl_init(unsigned long map_start, unsigned long map_end, bool writeable)
 			assert(ttbl == ttbl_l3);
 			ttbl_c.next_ttbl += TTBL_L3_ENTRY_CNT;
 			assert(ttbl_c.next_ttbl == ttbl_next);
+			assert(ttbl_l3[1] == 0);
 		}
 		/* Setup level-3 ttbl */
 		page_idx = count_pages;
-		count_pages++;
 		// page_idx = (page_addr & TTBL_LEVEL3_MASK) >> TTBL_LEVEL3_SHIFT;
 		if (!ttbl_entry_is_valid(ttbl[page_idx])) {
 			/* Setup level-3 ttbl entry */
@@ -120,35 +123,18 @@ void ttbl_init(unsigned long map_start, unsigned long map_end, bool writeable)
 			ttbl[page_idx] |= (0x3 << TTBL_LOWER_SH_SHIFT);
 			ttbl[page_idx] |= (TTBL_VALIDATE_ENTRY_MASK | TTBL_TABLE_ENTRY_MASK);
 
-			printf("Entry #%d %p maps page 0x%012llx: 0x%016llx\n", (count_pages - 1), &ttbl[page_idx], page_addr, ttbl[page_idx]);
-
 		}
-
+		printf("Entry #%d maps page 0x%012llx: 0x%016llx\n", count_pages, page_addr, ttbl[page_idx]);
+		count_pages++;
 		page_addr += TTBL_PAGESIZE;
 	}
-/*
-	ttbl_entry_set_ap(&ttbl_l1, 1);
-	//ttbl_entry_set_next_table_addr(&ttbl_l1, addr);
-	printf("ttbl_l1 at %p: 0x%016llx\n", &ttbl_l1, ttbl_l1);
-	addr = 0x111101110;
-	ttbl_entry_set_ap(&ttbl_l2, 1);
-	//ttbl_entry_set_next_table_addr(&ttbl_l2, addr);
-	printf("ttbl_l2 at %p: 0x%016llx\n", &ttbl_l2, ttbl_l2);
-	for (i = 0; p <= &ttbl_l3[511]; p++, i++) {
-		entry = p;
-		*entry = 0x0ULL;
-		//printf("ttbl_l3[i] at %p, entry at %p, p at %p\n", &ttbl_l3[i], entry, p);
-		ttbl_entry_set_ap(entry, 1);
-		//printf("ttbl_l3 entry #%d at %p: 0x%016llx\n", i, entry, *entry);
-	}
-*/
 
 }
 
 int main()
 {
 	struct page *pages_start = &pages[0];
-	struct page *pages_end = &pages[511];
+	struct page *pages_end = &pages[TTBL_L3_ENTRY_CNT - 1];
 	pages_end++;
 
 	ttbr_el1_baddr = (unsigned long) ttbl_array;
